@@ -42,7 +42,8 @@ app.get("/homepage", (req, res) => {
 
 //Get method to get all reviews for the user.
 app.get("/reviews", async (req, res) => {
-    
+
+    //Try to get the reviews from the database, Catch any errors.
     try {
 
         //This query gets the results of all reviews from the selected user.
@@ -67,27 +68,34 @@ app.get("/reviews", async (req, res) => {
     }
 });
 
+//Starting screen's post request.
 app.post("/start", (req, res) => {
-    
+
+    //If the user clicks the signin button, have them sign in.
     if(req.body["signin"]){
         res.render("signin.ejs");
     }
-    
+
+    //Else, take them to create a new account.
     else{
         res.render("create.ejs");
     }
  
 });
 
+//Sign-in post request.
 app.post("/signin", async(req, res) => {
-    
+
+    //Grabs the username and password from the user.
     const username = req.body.username;
     const password = req.body.password;  
 
+    //Try to find the user, Catch if the user is not in the database.
     try {
         
         const result = await db.query("SELECT * FROM users WHERE username = $1", [username.trim()]);
 
+        //Try to find the correct password for the user, Catch if the password is incorrect.
         try { 
             
             if(result.rows.length > 0){
