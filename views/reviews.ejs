@@ -1,0 +1,61 @@
+<%- include("partials/header.ejs") %>
+
+    <div class="mb-5 py-4 mx-auto" style="width: 450px">
+    
+    <%# If there is a username and messages, and if there is history... %>    
+    <% if(locals.username && locals.reviews){ %>
+        <br>
+        
+        <h1 class="text-center">Reviews</h1>
+
+        <br>
+
+        <%# Display all comments in messages with card elements.
+            Username, messages, and history are labeled in index.js %>
+        <% for(let i = 0; i < reviews.length; i++) {%>
+      
+          <div id="messageH" class="card d-flex flex-row comment-row mt-5 cards" style="width: 450px;"> 
+            <div class="card-body comment-text active w-100"> 
+                  <h6 class="font-medium">  </h6> 
+                  <img class="mb-3" src="<%= reviews[i].book_cover %>" alt="Book Review">
+                  <span id="message" class="m-b-15 d-block mb-2"> Title: <%= reviews[i].title %> </span>
+                  <span id="message" class="m-b-15 d-block mb-2"> Author: <%= reviews[i].author %> </span>
+                  <span id="message" class="m-b-15 d-block mb-2"> Rating: <%= reviews[i].rating %> </span>
+                  <span id="message" class="m-b-15 d-block mb-2"> Review: </span>
+                  
+                  <form class="d-inline" action="edit" method="post">
+                      <textarea id="review" class="mb-3 review" cols="50" rows="8" name="review" value= "<%= reviews[i].review %>" readonly> <%= reviews[i].review %></textarea>
+                      <div class="comment-footer mt-1 ml-2"> <%= username %> <span class="text-muted float-right mb-2"><%= new Date().toLocaleDateString('en-us', { weekday:"long", year:"numeric", month:"short", day:"numeric"}) %></span>      
+                      <br>           
+                      <button type="button" class="btn btn-cyan btn-sm btn-primary edit mt-2" name="edit" value="<%= reviews[i].review_id %>">Edit</button>                 
+                  </form>
+                    
+                  <button type="button" class="btn btn-danger btn-sm cancel hidden mt-2" name="cancel">Cancel</button>
+                  
+                  <form class="d-inline" action="delete" method="post">
+                      <button type="submit" class="btn btn-danger btn-sm delete mt-2" name="delete" value="<%= reviews[i].review_id %>">Delete</button>     
+                  </form>
+                  
+                </div>
+            </div>
+           
+        </div>
+        <% } %>
+    
+        <%# Else, there is no history. %>
+    <% } else { %>
+
+        <br>
+
+        <h1 class="text-center">No History</h1>
+    <% } %>
+      
+   
+    
+    </div>
+
+   <script src="button.js"></script>
+
+  
+
+<%- include("partials/footer.ejs") %>

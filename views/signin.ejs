@@ -1,0 +1,24 @@
+<%- include('partials/header.ejs'); -%>
+
+<div class="d-flex align-items-center py-4">
+
+    <main class="form-signin w-100 m-auto">
+    <form action="/signin" method="POST"class="mx-auto mt-5" style="width: 450px;">
+      <h1 class="h3 mb-3 fw-normal">Sign in</h1>
+  
+      <div class="form-floating">
+        <input type="username" class="form-control" id="floatingInput" placeholder="Username" name="username">
+        <label for="floatingInput">Username</label>
+      </div>
+      <div class="form-floating mt-2 mb-2">
+        <input type="password" class="form-control" id="floatingPassword" placeholder="Password" name="password">
+        <label for="floatingPassword">Password</label>
+      </div>
+  
+      <button class="btn btn-primary w-100 py-2" type="submit">Sign in</button>
+    </form>
+  </main>
+
+</div>  
+
+<%- include('partials/footer.ejs'); -%>

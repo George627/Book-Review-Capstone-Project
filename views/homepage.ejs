@@ -1,0 +1,121 @@
+<%- include('partials/header.ejs'); -%> 
+
+<% if(locals.username){ %>
+
+<h1 class="mx-3 mt-4 py-2 mb-5" style="width: 100vh">Hello! <%= username %></h1>
+
+<form
+  action="/homepage"
+  method="post"
+  class="mx-auto mt-5"
+  style="width: 470px"
+>
+  <h3>Enter the following information for you book. (Book must have a vaild ISBN number.)</h3>
+
+  <div class="form-floating mt-3 mb-2">
+    <input
+      type="text"
+      class="form-control"
+      id="floating"
+      placeholder="Type the title of the book"
+      name="title"
+    />
+    <label for="floating">Title:</label>
+  </div>
+
+  <div class="form-floating mt-2 mb-3">
+    <input
+      type="text"
+      class="form-control"
+      id="floating"
+      placeholder="Type the author of the book"
+      name="author"
+    />
+    <label for="floating">Author:</label>
+  </div>
+
+  <button class="btn btn-primary w-100 py-2 mt-2" type="submit">Find Book!</button>
+</form>
+
+<% if(locals.image){ %>
+<div class="row">
+  <div class="mx-auto mt-5" style="width: 500px">
+    <div class="col-lg-4">
+      <% if(locals.title){ %>
+      
+      <form action="/add" method="post">
+
+        <fieldset>
+
+        <legend>Review:</legend>
+
+        <img class="mb-3" src= <%= image %> alt="Book Review">
+
+        <input class="hidden" type="text" name="cover" value= <%= image %>>
+
+        <br />
+
+        <label class="mt-3 mb-2" for="title">Title: </label>
+
+        <br>
+
+        <input type="text" name="title" value= '<%= title %>' size="40" readonly>
+        
+        <br>
+        
+        <label class="mt-3 mb-2" for="author">Author: </label>
+
+        <br>
+
+        <input type="text" name="author" id="author" value= '<%= author %>' readonly>
+        
+        <br>
+
+        <label class="mt-3 mb-2" for="rating">Rating:</label>
+
+        <br>
+
+        <select name="rating" id="rating">
+          <option value="⭐">⭐</option>
+          <option value="⭐⭐">⭐⭐</option>
+          <option value="⭐⭐⭐">⭐⭐⭐</option>
+          <option value="⭐⭐⭐⭐">⭐⭐⭐⭐</option>
+          <option value="⭐⭐⭐⭐⭐">⭐⭐⭐⭐⭐</option>
+        </select>
+        <br />
+        <label class="mt-2 mb-2" for="review">Book Review:</label>
+
+        <textarea
+          id="review"
+          placeholder="Write your review..."
+          name="review"
+          rows="4"
+          cols="50"
+          maxlength="500"
+        ></textarea>
+
+        <br />
+
+        <div style="text-align: center">
+          <button
+            class="btn btn-primary py-2 mt-3"
+            type="submit"
+            value="Submit"
+          >
+            Create Review!
+          </button>
+        </div>
+        </fieldset>
+      </form>
+
+      <% } %>
+    </div>
+  </div>
+</div>
+<% } %> 
+
+<% } else { %>
+<h1>Greetings!</h1>
+<% } %> 
+
+<%- include('partials/footer.ejs'); -%>

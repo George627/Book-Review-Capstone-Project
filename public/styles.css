@@ -1,0 +1,39 @@
+html{
+    min-height: 100%;
+}
+
+body {
+    background: rgb(146, 251, 255);
+    color: rgb(0, 38, 71);
+    height: 100%;
+}
+
+footer {
+    flex: 0 0 auto;
+    color: white;
+    text-align: center;
+}
+
+.hidden{
+    display: none;
+}
+
+fieldset {
+    display: block;
+    min-width: 475px;
+    margin-left: 2px;
+    margin-right: 2px;
+    padding-top: 0.35em;
+    padding-bottom: 0.625em;
+    padding-left: 0.75em;
+    padding-right: 0.75em;
+    border: solid;
+    border-width: medium;
+  }
+
+.welcome{
+    text-align: center;
+    width: 500px; 
+    justify-content: center; 
+    display: flex;
+}
