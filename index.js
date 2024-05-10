@@ -3,6 +3,7 @@ import bodyParser from "body-parser";
 import pg from "pg";
 import axios from "axios";
 
+//Establishing the database.
 const db = new pg.Client({
     user: "postgres",
     host: "localhost",
@@ -11,38 +12,51 @@ const db = new pg.Client({
     port: 5432
 });
 
+//Connecting to the database.
 db.connect();
 
+//Setting up the app and the port number.
 const app = express();
 const port = 3000;
 
+//Placeholder for the username.
 let reviewer = '';
 
+//Body-Parser as well as setting up the static route to public.
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
-
+//Get method for the starting page of the app.
 app.get("/", (req, res) => {
     res.render("start.ejs");
 });
 
+//Get method for the homepage.
 app.get("/homepage", (req, res) => {
-    res.render("homepage.ejs", {
+    
+    //Render the homepage.ejs with the user. The user is created from the signin or create post request.
+    res.render("homepage.ejs", {     
         username: reviewer
     });
 });
 
+//Get method to get all reviews for the user.
 app.get("/reviews", async (req, res) => {
     
     try {
+
+        //This query gets the results of all reviews from the selected user.
         const results = await db.query("SELECT * FROM reviews WHERE username = $1", [reviewer]);
 
+        //Empty reviews array that will hold all the results.
         const reviews = [];
-        
+
+        //ForEach method that pushes all data from the results into the reviews array.
         results.rows.forEach((ele) => {
             reviews.push(ele);
         })
 
+        //Render the reviews.ejs page with the username and the reviews.
         res.render("reviews.ejs", {
             username: reviewer,
             reviews: reviews 
