@@ -93,30 +93,39 @@ app.post("/signin", async(req, res) => {
     //Try to find the user, Catch if the user is not in the database.
     try {
         
+        //Select the user's username from the users database.
         const result = await db.query("SELECT * FROM users WHERE username = $1", [username.trim()]);
 
-        //Try to find the correct password for the user, Catch if the password is incorrect.
+        //Try & Catch if there is a problem getting the password from the database.
         try { 
             
+            //If there is a result from the database, check the password associated with the username.
             if(result.rows.length > 0){
+                
                 const user = result.rows[0];
 
+                //The database password.
                 const databasePassword = user.password;
 
+                //Compare the database password with the user's password.
                 if(password.trim() === databasePassword){
                     
+                    //The reviewer becomes the user stored in the database. 
                     reviewer = user.username;
                     
+                    //Render the homepage.ejs with the user.
                     res.render("homepage.ejs", {
                         username: reviewer
                     });
                 }
 
+                //They do not match, wrong password.
                 else {
                     res.send("Wrong password.")
                 }
             }
 
+            //Else, no result, user not found.
             else{
                 res.send("Can't find that User.");
             }
@@ -126,33 +135,40 @@ app.post("/signin", async(req, res) => {
         }
 
     } catch (error) {
-        res.send("Error finding user.", error);
+        res.send("Error finding user in database.", error);
     }
  
 });
 
+//Create post request.
 app.post("/create", async(req, res) => {
 
+    //Grabs the username and password from the user.
     const username = req.body.username.trim();
     const password = req.body.password.trim();  
 
+    //Try Catch checks if the user is in the database.
     try {
 
         const result = await db.query("SELECT * FROM users WHERE username = $1", [username]);
 
+        //If there are no results, add the user and password to the users database.
         if(result.rows.length === 0){
             await db.query(
                 "INSERT INTO users(username, password) VALUES ($1, $2)",
                 [username, password]
             );
 
+            //The reviewer becomes the user's name. 
             reviewer = username;
 
+            //Render the homepage.ejs with the user.
             res.render("homepage.ejs", {
                 username: reviewer
             });
         }
 
+        //Else, the user already exist in the database.
         else {
             res.send("User already exist.");
         }
@@ -163,63 +179,70 @@ app.post("/create", async(req, res) => {
 
 });
 
+//Homepage post request.
 app.post("/homepage", async(req, res) => {
     
+    //Grabs the author and title from the user.
     const author = req.body.author.trim();
-
     const title = req.body.title.trim();
 
+    //Try Catch statement that uses the Open Library API. 
     try {
+        
+        //Getting results from the API request using the title and author from the user. 
         const results = await axios.get(`https://openlibrary.org/search.json?title=${title}&author=${author}`);
 
+        //Placeholder to get the cover, author, and title for the book. 
         let cover = '';
-
         let resultAuthor = '';
-
         let resultTitle = '';
 
-        try {
-            if(results.data.numFound === 0){
-                res.send("Book not found, please try another book.");
-            }
-
-            else{
-                
-
-                if(results.data.docs.length > 0){
-                
-                cover = results.data.docs[0].cover_edition_key;
-
-                resultAuthor = results.data.docs[0].author_name;
-
-                resultTitle = results.data.docs[0].title;
-                
-                }
-
-                else{
-
-                    cover = results.data.docs.cover_edition_key;
-
-                    resultAuthor = results.data.docs.author_name;
-
-                    resultTitle = results.data.docs.title;
-                }
-
-                
-                cover = await axios.get("https://covers.openlibrary.org/b/olid/" + cover + "-M.jpg");
-
-                res.render("homepage.ejs", {
-                    username: reviewer,
-                    image: cover.config.url,
-                    author: resultAuthor,
-                    title: resultTitle,
-                });
-
-            }
-        } catch (error) {
-            
+        //If there are no results from the request, then the API has no infomation on the book.
+        if(results.data.numFound === 0){
+            res.send("Book not found, please try another book.");
         }
 
+        //Else, check to see if the book has more than one entry. 
+        else{
+            
+            //If the book results have more than one entry, grab the first results information.
+            if(results.data.docs.length > 0){
+                
+                //Gets the cover ID of the book.
+                cover = results.data.docs[0].cover_edition_key;
+
+                //Gets the author of the book.
+                resultAuthor = results.data.docs[0].author_name;
+
+                //Gets the title of the book.
+                resultTitle = results.data.docs[0].title;
+            
+            }
+
+            //Else, grab the only result information.
+            else{
+
+                //Gets the cover ID of the book.
+                cover = results.data.docs.cover_edition_key;
+
+                //Gets the author of the book.
+                resultAuthor = results.data.docs.author_name;
+
+                //Gets the title of the book.
+                resultTitle = results.data.docs.title;
+            }
+
+            //Get the cover of the book using the Open Library Covers API.
+            cover = await axios.get("https://covers.openlibrary.org/b/olid/" + cover + "-M.jpg");
+
+            //Render the homepage.ejs with the user, cover, author, and title for the book.
+            res.render("homepage.ejs", {
+                username: reviewer,
+                image: cover.config.url,
+                author: resultAuthor,
+                title: resultTitle,
+            });
+        }
         
     } catch (error) {
         res.send("Error in homepage.", error);
@@ -227,26 +250,31 @@ app.post("/homepage", async(req, res) => {
 
 });
 
+//Add post request.
 app.post("/add", async(req, res) => {
 
-    console.log(req.body);
-
+    //Grabs the following information submitted for the book review. 
     const title = req.body.title;
     const author = req.body.author;
     const rating = req.body.rating;
     const review = req.body.review;
     const cover = req.body.cover;
 
-
+    //Try to get the user's id from the users database. Catch any errors accessing the database.
     try {
 
         const result = await db.query("SELECT id FROM users WHERE username = $1", [reviewer]);
 
+        //Gets user's id. 
         const id = result.rows[0].id;
         
+        //Try to insert data into the database. Catch any errors submitting to database.
         try {
-            await db.query("INSERT INTO reviews (user_id, username, book_cover, review, title, author, rating) VALUES ($1, $2, $3, $4, $5, $6, $7)", [id, reviewer, cover, review, title, author, rating]);
 
+            await db.query("INSERT INTO reviews (user_id, username, book_cover, review, title, author, rating) VALUES ($1, $2, $3, $4, $5, $6, $7)", 
+            [id, reviewer, cover, review, title, author, rating]);
+
+            //Render the homepage.ejs with the user, cover, author, and title for the book.
             res.render("homepage.ejs", {
                 username: reviewer,
                 author: author,
@@ -255,28 +283,33 @@ app.post("/add", async(req, res) => {
             });
         
         } catch (error) {
-            res.send("Error in accessing database.", error);
+            res.send("Error submitting data into database.", error);
         }
+
     } catch (error) {
-        res.send("Error inserting into database.", error); 
+        res.send("Error in accessing database.", error); 
     }
-
-    
-
     
 });
 
+//Review post request.
 app.post("/reviews", async(req, res) => {
 
+    //Try to get the reviews from the database, Catch errors accessing the database.
     try {
+
+        //This query gets the results of all reviews from the selected user.
         const results = await db.query("SELECT * FROM reviews WHERE username = $1", [reviewer]);
 
+        //Empty reviews array that will hold all the results.
         const reviews = [];
         
+        //ForEach method that pushes all data from the results into the reviews array.
         results.rows.forEach((ele) => {
             reviews.push(ele);
         });
 
+        //Render the reviews.ejs page with the username and the reviews.
         res.render("reviews.ejs", {
             username: reviewer,
             reviews: reviews 
@@ -288,27 +321,40 @@ app.post("/reviews", async(req, res) => {
 
 });
 
+//Edit post request.
 app.post("/edit", async (req, res) => {
+    
+    //Grabs the review.
     const item = req.body;
 
+    //Try to update review in the database. Catch errors in updating the database.
     try {
-        const results = await db.query("UPDATE reviews SET review = $1 WHERE review_id = $2 AND username = $3", [item.review, item.edit, reviewer]);
+        
+        //Update the review of the user and where the review ID is located.
+        await db.query("UPDATE reviews SET review = $1 WHERE review_id = $2 AND username = $3", [item.review, item.edit, reviewer]);
 
+        //Redirect to reviews.ejs
         res.redirect("/reviews");
         
     } catch (error) {
-        res.send("Error in accessing database.", error);
+        res.send("Error updating database.", error);
     }  
     
 });
 
+//Delete post request.
 app.post("/delete", async(req, res) => {
     
+    //Grabs review Id.
     const reviewID = req.body.delete;
 
+    //Try to delete the review from the database, Catch errors deleting review from the database.
     try {
-        const results = await db.query("DELETE FROM reviews WHERE username = $1 AND review_id = $2", [reviewer, reviewID]);
+        
+        //Delete the review of the user and where the review ID is located.
+        await db.query("DELETE FROM reviews WHERE username = $1 AND review_id = $2", [reviewer, reviewID]);
 
+        //Redirect to reviews.ejs
         res.redirect("/reviews");
         
     } catch (error) {
@@ -317,6 +363,7 @@ app.post("/delete", async(req, res) => {
 
 });
 
+//Listening Port.
 app.listen(port, () => {
     console.log(`Server running on port ${port}`);
 });
