@@ -1,14 +1,20 @@
 <%- include('partials/header.ejs'); -%>
 
+<%# Welcome message. %>
 <div class="welcome mt-5 d-flex justify-content-center mx-auto">
     <h1 class="align-items-center" >Welcome to the Book Review app! Please sign in, or create a new account!</h1>
 </div>
 
+<%# Form that submits to the start post request located in index.js. %>
 <form action="/start" method="post">
     <div class="d-flex gap-2 justify-content-center py-5"> 
+        
+        <%# Signin button. %>
         <button class="btn btn-primary d-inline-flex align-items-center" type="submit" name="signin" value="signin">
         Sign In
         </button>
+        
+        <%# Create account button. %>
         <button class="btn btn-light d-inline-flex align-items-center" type="submit" name="create" value="create">
         Create Account
         </button>

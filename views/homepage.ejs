@@ -1,17 +1,18 @@
 <%- include('partials/header.ejs'); -%> 
 
+<%# If statement that checks if the user's username is available. 
+If avaialbe, run the homepage. %>
 <% if(locals.username){ %>
 
+<%# Username greeter. %>
 <h1 class="mx-3 mt-4 py-2 mb-5" style="width: 100vh">Hello! <%= username %></h1>
 
-<form
-  action="/homepage"
-  method="post"
-  class="mx-auto mt-5"
-  style="width: 470px"
->
+<%# Form that submits to the homepage post request located in index.js. %>
+<form action="/homepage" method="post" class="mx-auto mt-5" style="width: 470px">
+  
   <h3>Enter the following information for you book. (Book must have a vaild ISBN number.)</h3>
 
+  <%# Title text box. %>
   <div class="form-floating mt-3 mb-2">
     <input
       type="text"
@@ -23,6 +24,7 @@
     <label for="floating">Title:</label>
   </div>
 
+  <%# Author text box. %>
   <div class="form-floating mt-2 mb-3">
     <input
       type="text"
@@ -34,27 +36,36 @@
     <label for="floating">Author:</label>
   </div>
 
+  <%# Find book button. %>
   <button class="btn btn-primary w-100 py-2 mt-2" type="submit">Find Book!</button>
 </form>
 
+<%# If statement that checks if the book's image is available. 
+If avaialbe, create a review box with the following information... %>
 <% if(locals.image){ %>
 <div class="row">
   <div class="mx-auto mt-5" style="width: 500px">
     <div class="col-lg-4">
+
+      <%# If statement that checks if the book's title is available. %>
       <% if(locals.title){ %>
       
+      <%# Form that submits to the add post request located in index.js. %>
       <form action="/add" method="post">
 
+        <%# Fieldset containing the review. %>
         <fieldset>
 
         <legend>Review:</legend>
 
+        <%# Image tag that contains the book image. %>
         <img class="mb-3" src= <%= image %> alt="Book Review">
-
+        
         <input class="hidden" type="text" name="cover" value= <%= image %>>
 
         <br />
 
+        <%# Label tag that contains the book's title. %>
         <label class="mt-3 mb-2" for="title">Title: </label>
 
         <br>
@@ -63,6 +74,7 @@
         
         <br>
         
+        <%# Label tag that contains the author of the book. %>
         <label class="mt-3 mb-2" for="author">Author: </label>
 
         <br>
@@ -71,6 +83,7 @@
         
         <br>
 
+        <%# Label tag that contains the book's rating. %>
         <label class="mt-3 mb-2" for="rating">Rating:</label>
 
         <br>
@@ -83,6 +96,8 @@
           <option value="⭐⭐⭐⭐⭐">⭐⭐⭐⭐⭐</option>
         </select>
         <br />
+
+        <%# Label tag that contains the book's review. %>
         <label class="mt-2 mb-2" for="review">Book Review:</label>
 
         <textarea
@@ -96,15 +111,11 @@
 
         <br />
 
+        <%# Create review button. %>
         <div style="text-align: center">
-          <button
-            class="btn btn-primary py-2 mt-3"
-            type="submit"
-            value="Submit"
-          >
-            Create Review!
-          </button>
+          <button class="btn btn-primary py-2 mt-3" type="submit" value="Submit">Create Review!</button>
         </div>
+
         </fieldset>
       </form>
 
@@ -114,8 +125,9 @@
 </div>
 <% } %> 
 
+<%# Else, ask the guest to signin or create a account. %>
 <% } else { %>
-<h1>Greetings!</h1>
+<h1>Welcome Guest! Please signin or create a account.</h1>
 <% } %> 
 
 <%- include('partials/footer.ejs'); -%>
