@@ -17,8 +17,13 @@
             <div class="card-body comment-text active w-100"> 
                   <h6 class="font-medium">  </h6> 
 
-                  <%# Book cover image of review. %> 
-                  <img class="mb-3" src="<%= reviews[i].book_cover %>" alt="Book Review">
+                  <% if(reviews[i].book_cover === 'https://covers.openlibrary.org/b/olid/undefined-M.jpg') { %>
+                    <img class="mb-3" src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/1665px-No-Image-Placeholder.svg.png" alt="Book Review" width="180px" height="271px">
+
+                  <% } else { %>
+                        <%# Book cover image of review. %> 
+                        <img class="mb-3" src="<%= reviews[i].book_cover %>" alt="Book Review">
+                  <% } %>
 
                   <%# Book title of review. %> 
                   <span id="message" class="m-b-15 d-block mb-2"> Title: <%= reviews[i].title %> </span>

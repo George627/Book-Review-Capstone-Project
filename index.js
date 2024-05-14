@@ -208,7 +208,7 @@ app.post("/homepage", async(req, res) => {
             
             //If the book results have more than one entry, grab the first results information.
             if(results.data.docs.length > 0){
-                
+
                 //Gets the cover ID of the book.
                 cover = results.data.docs[0].cover_edition_key;
 
@@ -222,7 +222,7 @@ app.post("/homepage", async(req, res) => {
 
             //Else, grab the only result information.
             else{
-
+                
                 //Gets the cover ID of the book.
                 cover = results.data.docs.cover_edition_key;
 
