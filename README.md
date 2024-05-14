@@ -12,3 +12,7 @@ You can edit the reviews by clicking the button, or delete the review by clickin
 Click the homepage tab to pull up the homepage.
 
 Will add a sort feature for reviews at a later date.
+
+Name of APIs:
+https://openlibrary.org/dev/docs/api/covers
+https://openlibrary.org/dev/docs/api/search
