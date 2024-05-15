@@ -59,10 +59,11 @@ If avaialbe, create a review box with the following information... %>
         <legend>Review:</legend>
 
         <%# Image tag that contains the book image. %>
-        <img class="mb-3" src= <%= image %> alt="Book Review">
         
+        <img class="mb-3" src= <%= image %> alt="Book Review" width="180px" height="271px"> 
+      
         <input class="hidden" type="text" name="cover" value= <%= image %>>
-
+        
         <br />
 
         <%# Label tag that contains the book's title. %>

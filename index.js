@@ -65,7 +65,7 @@ app.get("/reviews", async (req, res) => {
         });
         
     } catch (error) {
-        res.send("Error in accessing database.", error);
+        res.status("Error in accessing database.", error);
     }
 });
 
@@ -122,21 +122,21 @@ app.post("/signin", async(req, res) => {
 
                 //They do not match, wrong password.
                 else {
-                    res.send("Wrong password.")
+                    res.status("Wrong password.")
                 }
             }
 
             //Else, no result, user not found.
             else{
-                res.send("Can't find that User.");
+                res.status("Can't find that User.");
             }
 
         } catch (error) {
-            res.send("Error on getting password.", error)
+            res.status("Error on getting password.", error)
         }
 
     } catch (error) {
-        res.send("Error finding user in database.", error);
+        res.status("Error finding user in database.", error);
     }
  
 });
@@ -171,11 +171,11 @@ app.post("/create", async(req, res) => {
 
         //Else, the user already exist in the database.
         else {
-            res.send("User already exist.");
+            res.status("User already exist.");
         }
         
     } catch (error) {
-        res.send("Error adding credentials into database", error);
+        res.status("Error adding credentials into database", error);
     }
 
 });
@@ -200,7 +200,7 @@ app.post("/homepage", async(req, res) => {
 
         //If there are no results from the request, then the API has no infomation on the book.
         if(results.data.numFound === 0){
-            res.send("Book not found, please try another book.");
+            res.status("Book not found, please try another book.");
         }
 
         //Else, check to see if the book has more than one entry. 
@@ -236,17 +236,23 @@ app.post("/homepage", async(req, res) => {
             //Get the cover of the book using the Open Library Covers API.
             cover = await axios.get("https://covers.openlibrary.org/b/olid/" + cover + "-M.jpg");
 
+            //If the cover url is undefined, set the url to a no image png.
+            if(cover.config.url === 'https://covers.openlibrary.org/b/olid/undefined-M.jpg'){
+                cover.config.url = 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/1665px-No-Image-Placeholder.svg.png';
+            }
+          
             //Render the homepage.ejs with the user, cover, author, and title for the book.
             res.render("homepage.ejs", {
                 username: reviewer,
                 image: cover.config.url,
                 author: resultAuthor,
                 title: resultTitle,
-            });
+            }); 
+              
         }
         
     } catch (error) {
-        res.send("Error in homepage.", error);
+        res.status("Error in homepage.", error);
     }
 
 });
@@ -284,11 +290,11 @@ app.post("/add", async(req, res) => {
             });
         
         } catch (error) {
-            res.send("Error submitting data into database.", error);
+            res.status(error).send("Error submitting data into database."); 
         }
 
     } catch (error) {
-        res.send("Error in accessing database.", error); 
+        res.status(error).send("Error in accessing database."); 
     }
     
 });
@@ -317,7 +323,7 @@ app.post("/reviews", async(req, res) => {
         });
         
     } catch (error) {
-        res.send("Error in accessing database.", error);
+        res.status(error).send("Error in accessing database."); 
     }
 
 });
@@ -338,7 +344,7 @@ app.post("/edit", async (req, res) => {
         res.redirect("/reviews");
         
     } catch (error) {
-        res.send("Error updating database.", error);
+        res.status("Error updating database.", error);
     }  
     
 });
@@ -359,7 +365,7 @@ app.post("/delete", async(req, res) => {
         res.redirect("/reviews");
         
     } catch (error) {
-        res.send("Error in deleting review from database.", error);
+        res.status("Error in deleting review from database.", error);
     }
 
 });
