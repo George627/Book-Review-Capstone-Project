@@ -32,17 +32,96 @@ app.get("/", (req, res) => {
     res.render("start.ejs");
 });
 
+app.route("/homepage")
 //Get method for the homepage.
-app.get("/homepage", (req, res) => {
+.get((req, res) => {
     
     //Render the homepage.ejs with the user. The user is created from the signin or create post request.
     res.render("homepage.ejs", {     
         username: reviewer
     });
+
+})
+//Homepage post request.
+.post(async(req, res) => {
+    
+    //Grabs the author and title from the user.
+    const author = req.body.author.trim();
+    const title = req.body.title.trim();
+
+    //Try Catch statement that uses the Open Library API. 
+    try {
+        
+        //Getting results from the API request using the title and author from the user. 
+        const results = await axios.get(`https://openlibrary.org/search.json?title=${title}&author=${author}`);
+
+        //Placeholder to get the cover, author, and title for the book. 
+        let cover = '';
+        let resultAuthor = '';
+        let resultTitle = '';
+
+        //If there are no results from the request, then the API has no infomation on the book.
+        if(results.data.numFound === 0){
+            res.send("Book not found, please go back to try another book.");
+        }
+
+        //Else, check to see if the book has more than one entry. 
+        else{
+            
+            //If the book results have more than one entry, grab the first results information.
+            if(results.data.docs.length > 0){
+
+                //Gets the cover ID of the book.
+                cover = results.data.docs[0].cover_edition_key;
+
+                //Gets the author of the book.
+                resultAuthor = results.data.docs[0].author_name;
+
+                //Gets the title of the book.
+                resultTitle = results.data.docs[0].title;
+            
+            }
+
+            //Else, grab the only result information.
+            else{
+                
+                //Gets the cover ID of the book.
+                cover = results.data.docs.cover_edition_key;
+
+                //Gets the author of the book.
+                resultAuthor = results.data.docs.author_name;
+
+                //Gets the title of the book.
+                resultTitle = results.data.docs.title;
+            }
+
+            //Get the cover of the book using the Open Library Covers API.
+            cover = await axios.get("https://covers.openlibrary.org/b/olid/" + cover + "-M.jpg");
+
+            //If the cover url is undefined, set the url to a no image png.
+            if(cover.config.url === 'https://covers.openlibrary.org/b/olid/undefined-M.jpg'){
+                cover.config.url = 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/1665px-No-Image-Placeholder.svg.png';
+            }
+          
+            //Render the homepage.ejs with the user, cover, author, and title for the book.
+            res.render("homepage.ejs", {
+                username: reviewer,
+                image: cover.config.url,
+                author: resultAuthor,
+                title: resultTitle,
+            }); 
+              
+        }
+        
+    } catch (error) {
+        res.status(404).send(error, 'Error in the homepage.');
+    }
+
 });
 
+app.route("/reviews")
 //Get method to get all reviews for the user.
-app.get("/reviews", async (req, res) => {
+.get(async (req, res) => {
 
     //Try to get the reviews from the database, Catch any errors.
     try {
@@ -65,8 +144,36 @@ app.get("/reviews", async (req, res) => {
         });
         
     } catch (error) {
-        res.status("Error in accessing database.", error);
+        res.send("Error in accessing database.", error);
     }
+})
+//Review post request.
+.post(async(req, res) => {
+
+    //Try to get the reviews from the database, Catch errors accessing the database.
+    try {
+
+        //This query gets the results of all reviews from the selected user.
+        const results = await db.query("SELECT * FROM reviews WHERE username = $1", [reviewer]);
+
+        //Empty reviews array that will hold all the results.
+        const reviews = [];
+        
+        //ForEach method that pushes all data from the results into the reviews array.
+        results.rows.forEach((ele) => {
+            reviews.push(ele);
+        });
+
+        //Render the reviews.ejs page with the username and the reviews.
+        res.render("reviews.ejs", {
+            username: reviewer,
+            reviews: reviews 
+        });
+        
+    } catch (error) {
+        res.send("Error in accessing database."); 
+    }
+
 });
 
 //Starting screen's post request.
@@ -122,21 +229,21 @@ app.post("/signin", async(req, res) => {
 
                 //They do not match, wrong password.
                 else {
-                    res.status("Wrong password.")
+                    res.send("Wrong password.")
                 }
             }
 
             //Else, no result, user not found.
             else{
-                res.status("Can't find that User.");
+                res.send("Can't find that User.");
             }
 
         } catch (error) {
-            res.status("Error on getting password.", error)
+            res.send("Error on getting password.", error)
         }
 
     } catch (error) {
-        res.status("Error finding user in database.", error);
+        res.send("Error finding user in database.", error);
     }
  
 });
@@ -171,88 +278,11 @@ app.post("/create", async(req, res) => {
 
         //Else, the user already exist in the database.
         else {
-            res.status("User already exist.");
+            res.send("User already exist.");
         }
         
     } catch (error) {
-        res.status("Error adding credentials into database", error);
-    }
-
-});
-
-//Homepage post request.
-app.post("/homepage", async(req, res) => {
-    
-    //Grabs the author and title from the user.
-    const author = req.body.author.trim();
-    const title = req.body.title.trim();
-
-    //Try Catch statement that uses the Open Library API. 
-    try {
-        
-        //Getting results from the API request using the title and author from the user. 
-        const results = await axios.get(`https://openlibrary.org/search.json?title=${title}&author=${author}`);
-
-        //Placeholder to get the cover, author, and title for the book. 
-        let cover = '';
-        let resultAuthor = '';
-        let resultTitle = '';
-
-        //If there are no results from the request, then the API has no infomation on the book.
-        if(results.data.numFound === 0){
-            res.status("Book not found, please try another book.");
-        }
-
-        //Else, check to see if the book has more than one entry. 
-        else{
-            
-            //If the book results have more than one entry, grab the first results information.
-            if(results.data.docs.length > 0){
-
-                //Gets the cover ID of the book.
-                cover = results.data.docs[0].cover_edition_key;
-
-                //Gets the author of the book.
-                resultAuthor = results.data.docs[0].author_name;
-
-                //Gets the title of the book.
-                resultTitle = results.data.docs[0].title;
-            
-            }
-
-            //Else, grab the only result information.
-            else{
-                
-                //Gets the cover ID of the book.
-                cover = results.data.docs.cover_edition_key;
-
-                //Gets the author of the book.
-                resultAuthor = results.data.docs.author_name;
-
-                //Gets the title of the book.
-                resultTitle = results.data.docs.title;
-            }
-
-            //Get the cover of the book using the Open Library Covers API.
-            cover = await axios.get("https://covers.openlibrary.org/b/olid/" + cover + "-M.jpg");
-
-            //If the cover url is undefined, set the url to a no image png.
-            if(cover.config.url === 'https://covers.openlibrary.org/b/olid/undefined-M.jpg'){
-                cover.config.url = 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/1665px-No-Image-Placeholder.svg.png';
-            }
-          
-            //Render the homepage.ejs with the user, cover, author, and title for the book.
-            res.render("homepage.ejs", {
-                username: reviewer,
-                image: cover.config.url,
-                author: resultAuthor,
-                title: resultTitle,
-            }); 
-              
-        }
-        
-    } catch (error) {
-        res.status("Error in homepage.", error);
+        res.send("Error adding credentials into database", error);
     }
 
 });
@@ -290,42 +320,44 @@ app.post("/add", async(req, res) => {
             });
         
         } catch (error) {
-            res.status(error).send("Error submitting data into database."); 
+            res.send("Error submitting data into database."); 
         }
 
     } catch (error) {
-        res.status(error).send("Error in accessing database."); 
+        res.send("Error in accessing database."); 
     }
     
 });
 
-//Review post request.
-app.post("/reviews", async(req, res) => {
+//Sort post request.
+app.post("/sort", async(req, res) => {
 
-    //Try to get the reviews from the database, Catch errors accessing the database.
-    try {
+    const type = req.body.type;
+    const orderBy = req.body.order;
 
-        //This query gets the results of all reviews from the selected user.
-        const results = await db.query("SELECT * FROM reviews WHERE username = $1", [reviewer]);
+       //Try to get the reviews from the database, Catch any errors.
+        try {
+    
+            //This query gets the results of all reviews from the selected user and sorts them.
+            const results = await db.query(`SELECT * FROM reviews WHERE username = $1 ORDER BY ${type} ${orderBy}`, [reviewer]);
 
-        //Empty reviews array that will hold all the results.
-        const reviews = [];
-        
-        //ForEach method that pushes all data from the results into the reviews array.
-        results.rows.forEach((ele) => {
-            reviews.push(ele);
-        });
-
-        //Render the reviews.ejs page with the username and the reviews.
-        res.render("reviews.ejs", {
-            username: reviewer,
-            reviews: reviews 
-        });
-        
-    } catch (error) {
-        res.status(error).send("Error in accessing database."); 
-    }
-
+            //Empty reviews array that will hold all the results.
+            const reviews = [];
+    
+            //ForEach method that pushes all data from the results into the reviews array.
+            results.rows.forEach((ele) => {
+                reviews.push(ele);
+            })
+    
+            //Render the reviews.ejs page with the username and the reviews.
+            res.render("reviews.ejs", {
+                username: reviewer,
+                reviews: reviews
+            });
+           
+        } catch (error) {
+            res.status("Error in accessing database.", error);
+        }
 });
 
 //Edit post request.
@@ -344,7 +376,7 @@ app.post("/edit", async (req, res) => {
         res.redirect("/reviews");
         
     } catch (error) {
-        res.status("Error updating database.", error);
+        res.send("Error updating database.", error);
     }  
     
 });
@@ -365,7 +397,7 @@ app.post("/delete", async(req, res) => {
         res.redirect("/reviews");
         
     } catch (error) {
-        res.status("Error in deleting review from database.", error);
+        res.send("Error in deleting review from database.", error);
     }
 
 });
