@@ -421,8 +421,6 @@ app.post("/delete", async(req, res) => {
 
 
 passport.use(new Strategy(async function verify(username, password, cb){
-    
-    console.log(username + " " + password);
 
     //Try to find the user, Catch if the user is not in the database.
     try {
