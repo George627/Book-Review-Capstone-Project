@@ -37,6 +37,7 @@ db.connect();
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
+
 //Session.
 app.use(session({
     secret: process.env.SESSION_SECRET,
@@ -47,15 +48,19 @@ app.use(session({
     }
 }));
 
+
 //Passport session.
 app.use(passport.initialize());
 app.use(passport.session());
+
 
 //Get method for the starting page of the app.
 app.get("/", (req, res) => {
     res.render("start.ejs");
 });
 
+
+//Sign-in Route.
 app.route("/signin")
 //Sign-in get method
 .get((req, res) => {
@@ -68,6 +73,7 @@ app.route("/signin")
 }));
 
 
+//Create Route.
 app.route("/create")
 //Create get method.
 .get((req, res) => {
@@ -125,8 +131,9 @@ app.route("/create")
 });
 
 
+//Homepage Route.
 app.route("/homepage")
-//Get method for the homepage.
+//Homepage get request.
 .get((req, res) => {
     
     if(req.isAuthenticated()){
@@ -219,6 +226,7 @@ app.route("/homepage")
 });
 
 
+//Reviews Route.
 app.route("/reviews")
 //Get method to get all reviews for the user.
 .get(async (req, res) => {
@@ -292,6 +300,7 @@ app.post("/start", (req, res) => {
  
 });
 
+
 //Add post request.
 app.post("/add", async(req, res) => {
 
@@ -334,6 +343,7 @@ app.post("/add", async(req, res) => {
     
 });
 
+
 //Sort post request.
 app.post("/sort", async(req, res) => {
 
@@ -365,6 +375,7 @@ app.post("/sort", async(req, res) => {
         }
 });
 
+
 //Edit post request.
 app.post("/edit", async (req, res) => {
     
@@ -386,6 +397,7 @@ app.post("/edit", async (req, res) => {
     
 });
 
+
 //Delete post request.
 app.post("/delete", async(req, res) => {
     
@@ -406,6 +418,7 @@ app.post("/delete", async(req, res) => {
     }
 
 });
+
 
 passport.use(new Strategy(async function verify(username, password, cb){
     
@@ -462,16 +475,18 @@ passport.use(new Strategy(async function verify(username, password, cb){
 
 }));
 
+
 passport.serializeUser((user, cb) => {
     cb(null, user);
 });
+
 
 passport.deserializeUser((user, cb) => {
     cb(null, user);
 });
 
+
 //Listening Port.
 app.listen(port, () => {
     console.log(`Server running on port ${port}`);
 });
-  
