@@ -90,7 +90,7 @@ app.route("/create")
     try {
 
         const result = await db.query("SELECT * FROM users WHERE username = $1", [username]);
-
+         
         //If there are no results, add the user and password to the users database.
         if(result.rows.length === 0){
             
@@ -99,7 +99,7 @@ app.route("/create")
                 if(err){
                     console.log("Error hashing password: ", err);
                 }
-                
+                 
                 else{
                    const result = await db.query(
                         "INSERT INTO users(username, password) VALUES ($1, $2) RETURNING *",
@@ -125,7 +125,7 @@ app.route("/create")
         }
         
     } catch (error) {
-        res.send("Error adding credentials into database", error);
+        res.status(404).send(error);
     }
 
 });
