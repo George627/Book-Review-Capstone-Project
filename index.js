@@ -166,7 +166,7 @@ app.route("/homepage")
         let resultAuthor = '';
         let resultTitle = '';
 
-        //If there are no results from the request, then the API has no infomation on the book.
+        //If there are no results from the request, then the API has no information on the book.
         if(results.data.numFound === 0){
             res.send("Book not found, please go back to try another book.");
         }
