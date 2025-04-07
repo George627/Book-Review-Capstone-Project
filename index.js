@@ -1,13 +1,13 @@
 //Import Statements.
 import express from "express";
 import bodyParser from "body-parser";
-import pg from "pg";
 import axios from "axios";
 import bcrypt from "bcrypt";
 import session from "express-session";
 import passport from "passport";
 import { Strategy } from "passport-local";
 import env from "dotenv";
+import supabase from './supabaseClient.js';
 
 
 //Setting up the app and the port number.
@@ -19,19 +19,6 @@ const saltRounds = 10;
 
 //ENV Configuration.
 env.config();
-
-//Establishing the database.
-const db = new pg.Client({
-    user: process.env.PG_USER,
-    host: process.env.PG_HOST,
-    database: process.env.PG_DATABASE,
-    password: process.env.PG_PASSWORD,
-    port: process.env.PG_PORT,
-});
-
-//Connecting to the database.
-db.connect();
-
 
 //Body-Parser as well as setting up the static route to public.
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -56,7 +43,7 @@ app.use(passport.session());
 
 //Get method for the starting page of the app.
 app.get("/", (req, res) => {
-    res.render("start.ejs");
+    res.render("login.ejs");
 });
 
 
@@ -89,10 +76,16 @@ app.route("/create")
     //Try Catch checks if the user is in the database.
     try {
 
-        const result = await db.query("SELECT * FROM users WHERE username = $1", [username]);
-         
+        //const result = await db.query("SELECT * FROM users WHERE username = $1", [username]);
+        
+        const {data, error} = await supabase
+            .from('users')
+            .select('username')
+            .eq('username', username);
+
+       
         //If there are no results, add the user and password to the users database.
-        if(result.rows.length === 0){
+        if(data.length === 0){
             
             bcrypt.hash(password, saltRounds, async(err, hash) => {
                 
@@ -101,18 +94,32 @@ app.route("/create")
                 }
                  
                 else{
-                   const result = await db.query(
+                  /* const result = await db.query(
                         "INSERT INTO users(username, password) VALUES ($1, $2) RETURNING *",
                         [username, hash]
-                    );
+                    );*/
 
-                    const user = result.rows[0];
+                    const {data, error} = await supabase
+                        .from('users')
+                        .insert({ username: username, password: hash })
+                        .select();
 
-                    req.login(user, (err) => {
-                        console.log(err);
-                        res.redirect("/homepage");
-                    });
+                    if (error) {
+                        console.error("Error inserting user: ", error);
+                        return res.status(500).send("Error inserting user.");
+                    } else if (data.length === 0) {
+                        console.log('No results found for the query.');
+                    } else {
+                        const user = data[0].username;
 
+                        console.log("User logged in: ", user);
+                        
+                             
+                        req.login(user, (err) => {
+                            console.log(err);
+                            res.render("/homepage");
+                        }); 
+                    }
                 }
                  
             });
@@ -140,7 +147,7 @@ app.route("/homepage")
         
         //Render the homepage.ejs with the user. The user is created from the signin or create post request.
         res.render("homepage.ejs", {     
-            username: req.user.username
+            username: req.user
         });  
    
     } else {
@@ -150,10 +157,11 @@ app.route("/homepage")
 })
 //Homepage post request.
 .post(async(req, res) => {
-    
+
     //Grabs the author and title from the user.
     const author = req.body.author.trim();
     const title = req.body.title.trim();
+    
 
     //Try Catch statement that uses the Open Library API. 
     try {
@@ -211,7 +219,7 @@ app.route("/homepage")
           
             //Render the homepage.ejs with the user, cover, author, and title for the book.
             res.render("homepage.ejs", {
-                username: req.user.username,
+                username: req.user,
                 image: cover.config.url,
                 author: resultAuthor,
                 title: resultTitle,
@@ -235,19 +243,26 @@ app.route("/reviews")
     try {
 
         //This query gets the results of all reviews from the selected user.
-        const results = await db.query("SELECT * FROM reviews WHERE username = $1", [req.user.username]);
+        const { data, error } = await supabase
+            .from('reviews')
+            .select()
+            .eq('username', req.user);
+
+        if (error) {
+            return cb(error);
+        }   
 
         //Empty reviews array that will hold all the results.
         const reviews = [];
 
         //ForEach method that pushes all data from the results into the reviews array.
-        results.rows.forEach((ele) => {
+        data.forEach((ele) => {
             reviews.push(ele);
         })
 
         //Render the reviews.ejs page with the username and the reviews.
         res.render("reviews.ejs", {
-            username: req.user.username,
+            username: req.user,
             reviews: reviews 
         });
         
@@ -262,19 +277,26 @@ app.route("/reviews")
     try {
 
         //This query gets the results of all reviews from the selected user.
-        const results = await db.query("SELECT * FROM reviews WHERE username = $1", [req.user.username]);
+        const { data, error } = await supabase
+            .from('reviews')
+            .select()
+            .eq('username', req.user);
+
+        if (error) {
+            return cb(error);
+        }
 
         //Empty reviews array that will hold all the results.
         const reviews = [];
         
         //ForEach method that pushes all data from the results into the reviews array.
-        results.rows.forEach((ele) => {
+        data.forEach((ele) => {
             reviews.push(ele);
         });
 
         //Render the reviews.ejs page with the username and the reviews.
         res.render("reviews.ejs", {
-            username: req.user.username,
+            username: req.user,
             reviews: reviews 
         });
         
@@ -286,7 +308,7 @@ app.route("/reviews")
 
 
 //Starting screen's post request.
-app.post("/start", (req, res) => {
+app.post("/login", (req, res) => {
 
     //If the user clicks the signin button, have them sign in.
     if(req.body["signin"]){
@@ -314,20 +336,32 @@ app.post("/add", async(req, res) => {
     //Try to get the user's id from the users database. Catch any errors accessing the database.
     try {
 
-        const result = await db.query("SELECT id FROM users WHERE username = $1", [req.user.username]);
-
-        //Gets user's id. 
-        const id = result.rows[0].id;
+        //const result = await db.query("SELECT id FROM users WHERE username = $1", [req.user]);
+        const { data, error } = await supabase
+            .from('users')
+            .select('id')
+            .eq('username', req.user);
+            
+        if (error) {
+            return cb(error);
+        }
+        
+        const id = data[0].id;
         
         //Try to insert data into the database. Catch any errors submitting to database.
         try {
-
-            await db.query("INSERT INTO reviews (user_id, username, book_cover, review, title, author, rating) VALUES ($1, $2, $3, $4, $5, $6, $7)", 
-            [id, req.user.username, cover, review, title, author, rating]);
+            
+            const { error } = await supabase
+                .from('reviews')
+                .insert({ user_id: id, username: req.user, book_cover: cover, review: review, title: title, author: author, rating: rating });
+            
+            if (error) {
+                return cb(error);
+            }
 
             //Render the homepage.ejs with the user, cover, author, and title for the book.
             res.render("homepage.ejs", {
-                username: req.user.username,
+                username: req.user,
                 author: author,
                 title: title,
                 cover: cover  
@@ -348,25 +382,36 @@ app.post("/add", async(req, res) => {
 app.post("/sort", async(req, res) => {
 
     const type = req.body.type;
-    const orderBy = req.body.order;
+    let orderBy = req.body.order;
+
+    if(orderBy === "ASC"){
+        orderBy = true;
+    } else {
+        orderBy = false;
+    }
 
        //Try to get the reviews from the database, Catch any errors.
         try {
     
             //This query gets the results of all reviews from the selected user and sorts them.
-            const results = await db.query(`SELECT * FROM reviews WHERE username = $1 ORDER BY ${type} ${orderBy}`, [req.user.username]);
+            //const results = await db.query(`SELECT * FROM reviews WHERE username = $1 ORDER BY ${type} ${orderBy}`, [req.user]);
+            const { data, error } = await supabase
+                .from('reviews')
+                .select()
+                .eq('username', req.user)
+                .order(type, { ascending: orderBy });
 
             //Empty reviews array that will hold all the results.
             const reviews = [];
     
             //ForEach method that pushes all data from the results into the reviews array.
-            results.rows.forEach((ele) => {
+            data.forEach((ele) => {
                 reviews.push(ele);
             })
     
             //Render the reviews.ejs page with the username and the reviews.
             res.render("reviews.ejs", {
-                username: req.user.username,
+                username: req.user,
                 reviews: reviews
             });
            
@@ -381,12 +426,20 @@ app.post("/edit", async (req, res) => {
     
     //Grabs the review.
     const item = req.body;
-
+    
     //Try to update review in the database. Catch errors in updating the database.
     try {
         
         //Update the review of the user and where the review ID is located.
-        await db.query("UPDATE reviews SET review = $1 WHERE review_id = $2 AND username = $3", [item.review, item.edit, req.user.username]);
+        const {  error } = await supabase
+            .from('reviews')
+            .update({ review: item.review.trim() })
+            .eq('username', req.user)
+            .eq('review_id', item.edit);
+
+        if (error) {
+            return cb(error);
+        }
 
         //Redirect to reviews.ejs
         res.redirect("/reviews");
@@ -408,7 +461,15 @@ app.post("/delete", async(req, res) => {
     try {
         
         //Delete the review of the user and where the review ID is located.
-        await db.query("DELETE FROM reviews WHERE username = $1 AND review_id = $2", [req.user.username, reviewID]);
+        const { error } = await supabase
+            .from('reviews')
+            .delete()
+            .eq('username', req.user)
+            .eq('review_id', reviewID);
+
+        if (error) {
+            return cb(error);
+        }
 
         //Redirect to reviews.ejs
         res.redirect("/reviews");
@@ -420,59 +481,43 @@ app.post("/delete", async(req, res) => {
 });
 
 
-passport.use(new Strategy(async function verify(username, password, cb){
-
-    //Try to find the user, Catch if the user is not in the database.
+passport.use(new Strategy(async function verify(username, password, cb) {
     try {
-        
-        //Select the user's username from the users database.
-        const result = await db.query("SELECT * FROM users WHERE username = $1", [username.trim()]);
+        const { data, error } = await supabase
+            .from('users')
+            .select("username, password")
+            .eq('username', username.trim());
 
-            //If there is a result from the database, check the password associated with the username.
-            if(result.rows.length > 0){
-                
-                //User founded in database.
-                const user = result.rows[0];
+        if (error) {
+            return cb(error);
+        }
 
-                //The database password.
-                const databasePassword = user.password;
-                
-                //Compare the database password with the user's password.
-                bcrypt.compare(password, databasePassword, (err, result) => {
-                    
-                    //If there is a error comparing the passwords, return the error.
-                    if(err){
-                        return cb(err);
-                    }
+        // Check if the user exists in the database
+        if (data && data.length > 0) {
+            const user = data[0].username; // Access the first element of the array
+            const databasePassword = data[0].password; // Access the hashed password
 
-                    //Else, check if the passwords match.
-                    else{
-                        
-                        //If the passwords match, return the user.
-                        if(result){          
-                            return cb(null, user); 
-                        }
-  
-                        //Else, the passwords do not match.
-                        else{
-                            return cb(null, false);
-                        }
-                    }
-                });
+            // Compare the database password with the user's password
+            bcrypt.compare(password, databasePassword, (err, result) => {
+                if (err) {
+                    return cb(err);
+                }
 
-            }
-
-            //Else, no result, user not found.
-            else{
-                return cb("User not found");
-            }   
-
-    } catch (error) {
-        return cb(err);
+                if (result) {
+                    return cb(null, user); // Passwords match
+                } else {
+                    return cb(null, false); // Passwords do not match
+                }
+            });
+        } else {
+            return cb(null, false); // User not found
+        }
+    } catch (err) {
+        return cb(err); // Handle unexpected errors
     }
-
 }));
 
+    
 
 passport.serializeUser((user, cb) => {
     cb(null, user);
