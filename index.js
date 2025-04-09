@@ -40,6 +40,9 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
+app.set('view engine', 'ejs');
+
+app.set('views', './views');
 
 //Get method for the starting page of the app.
 app.get("/", (req, res) => {
@@ -94,11 +97,6 @@ app.route("/create")
                 }
                  
                 else{
-                  /* const result = await db.query(
-                        "INSERT INTO users(username, password) VALUES ($1, $2) RETURNING *",
-                        [username, hash]
-                    );*/
-
                     const {data, error} = await supabase
                         .from('users')
                         .insert({ username: username, password: hash })
@@ -111,13 +109,12 @@ app.route("/create")
                         console.log('No results found for the query.');
                     } else {
                         const user = data[0].username;
-
-                        console.log("User logged in: ", user);
-                        
                              
-                        req.login(user, (err) => {
-                            console.log(err);
-                            res.render("/homepage");
+                        req.logIn(user, (err) => {
+                            
+                            res.render("homepage.ejs", {     
+                                username: req.user
+                            }); 
                         }); 
                     }
                 }
