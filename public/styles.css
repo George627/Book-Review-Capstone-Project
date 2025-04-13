@@ -18,22 +18,62 @@ footer {
     display: none;
 }
 
-fieldset {
-    display: block;
-    min-width: 475px;
-    margin-left: 2px;
-    margin-right: 2px;
-    padding-top: 0.35em;
-    padding-bottom: 0.625em;
-    padding-left: 0.75em;
-    padding-right: 0.75em;
-    border: solid;
-    border-width: medium;
-  }
-
 .welcome{
     text-align: center;
     width: 500px; 
     justify-content: center; 
     display: flex;
 }
+
+
+@media screen and (min-width: 300px) and (max-width: 495px) { 
+    
+  /* Small devices (landscape phones, 576px and up) */
+    .form{
+        width: 300px;    
+    }
+
+    .form-signin{
+        width: 350px;    
+    }
+
+    .welcome{
+        text-align: center;
+        width: 300px; 
+        justify-content: center; 
+        display: flex;
+    }
+
+    fieldset {
+        display: block;
+        min-width: 350px;
+        margin-left: 2px;
+        margin-right: 2px;
+        padding-top: 0.35em;
+        padding-bottom: 0.625em;
+        padding-left: 0.75em;
+        padding-right: 0.75em;
+        border: solid;
+        border-width: medium;
+      }
+}
+
+@media screen and (min-width: 496px){ 
+    
+      .form{
+          width: 450px;    
+      }
+
+      fieldset {
+        display: block;
+        min-width: 475px;
+        margin-left: 2px;
+        margin-right: 2px;
+        padding-top: 0.35em;
+        padding-bottom: 0.625em;
+        padding-left: 0.75em;
+        padding-right: 0.75em;
+        border: solid;
+        border-width: medium;
+      }
+  }

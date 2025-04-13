@@ -1,6 +1,6 @@
 <%- include("partials/header.ejs") %>
 
-    <div class="mb-5 py-4 mx-auto" style="width: 450px">
+    <div class="mb-5 py-4 mx-auto form">
     
     <%# If there is a username and if there is reviews...%>    
     <% if(locals.username && locals.reviews){ %>
@@ -12,7 +12,7 @@
         
         <form action="/sort" method="post">
         
-            <div class="my-3" style="height: 75px">
+            <div class="my-3 text-center" style="height: 75px">
 
                 <label for="type">Sort by Title:</label>
 
@@ -21,8 +21,10 @@
                     <option value="author">Author</option>
                     <option value="rating">Rating</option>
                 </select>
+                
+                <br>
 
-                <label style="margin-left: 69px;" for="order">Sort by Order:</label>
+                <label class="mt-3" for="order">Sort by Order:</label>
 
                 <select name="order" id="order">
                     <option value="ASC">Ascending</option>
@@ -42,7 +44,7 @@
         <%# Display all reviews in messages with card elements. %>
         <% for(let i = 0; i < reviews.length; i++) {%>
       
-          <div id="messageH" class="card d-flex flex-row comment-row mt-5 cards" style="width: 450px;"> 
+          <div id="messageH" class="card d-flex flex-row comment-row mt-5 cards form"> 
             <div class="card-body comment-text active w-100"> 
                   <h6 class="font-medium">  </h6> 
 
@@ -63,7 +65,7 @@
                   
                   <%# Form for edit button. %> 
                   <form class="d-inline" action="edit" method="post">
-                      <textarea id="review" class="mb-3 review" cols="50" rows="8" name="review" value= "<%= reviews[i].review %>" readonly> <%= reviews[i].review %></textarea>
+                      <textarea id="review" class="mb-3 review" cols="35" rows="8" name="review" value= "<%= reviews[i].review %>" readonly> <%= reviews[i].review %></textarea>
                       <div class="comment-footer mt-1 ml-2"> <%= username %> <span class="text-muted float-right mb-2"><%= new Date().toLocaleDateString('en-us', { weekday:"long", year:"numeric", month:"short", day:"numeric"}) %></span>      
                       <br>           
                       <button type="button" class="btn btn-cyan btn-sm btn-primary edit mt-2" name="edit" value="<%= reviews[i].review_id %>">Edit</button>                 

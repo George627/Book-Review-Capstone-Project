@@ -41,7 +41,12 @@ router.route("/")
 
         //If there are no results from the request, then the API has no information on the book.
         if(results.data.numFound === 0){
-            res.send("Book not found, please go back to try another book.");
+            res.render("newbook.ejs", {
+                username: req.user,
+                image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/1665px-No-Image-Placeholder.svg.png',
+                author: author,
+                title: title,
+            }); 
         }
 
         //Else, check to see if the book has more than one entry. 
