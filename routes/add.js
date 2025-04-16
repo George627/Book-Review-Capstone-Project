@@ -13,9 +13,10 @@ router.post("/", async(req, res) => {
     const review = req.body.review;
     const cover = req.body.cover;
 
+
     //Try to get the user's id from the users database. Catch any errors accessing the database.
     try {
-
+        
         //const result = await db.query("SELECT id FROM users WHERE username = $1", [req.user]);
         const { data, error } = await supabase
             .from('users')

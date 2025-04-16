@@ -6,21 +6,32 @@
 </div>
 
 <%# Form that submits to the start post request located in index.js. %>
-<form class="mx-auto" action="/login" method="post">
-    <div class="d-flex gap-2 justify-content-center py-5"> 
+    <form class="mx-auto" action="/login" method="post">
+        <div class="d-flex gap-2 justify-content-center py-5"> 
         
-        <%# Signin button. %>
-        <button class="btn btn-primary d-inline-flex align-items-center" type="submit" name="signin" value="signin">
-        Sign In
-        </button>
-        
-        <%# Create account button. %>
-        <button class="btn btn-light d-inline-flex align-items-center" type="submit" name="create" value="create">
-        Create Account
+            <%# Signin button. %>
+            <button class="btn btn-primary d-inline-flex align-items-center" type="submit" name="signin" value="signin">
+            Sign In
+            </button>
+            
+            <%# Create account button. %>
+            <button class="btn btn-light d-inline-flex align-items-center" type="submit" name="create" value="create">
+            Create Account
+            </button>
+
+        </div>
+    </form>
+
+    <hr>
+
+    <div class="mx-auto mt-5 d-flex justify-content-center">
+        <button class="btn btn-light btn-lg d-flex align-items-center shadow-sm border rounded-pill px-4 py-2">
+            <a class="button google" href="/login/federated/google">
+                <img src="https://img.icons8.com/color/48/000000/google-logo.png" alt="Google Logo" class="me-2" width="24" height="24">
+                <span class="">Sign in with Google</span>
+            </a>
         </button>
     </div>
-</form>
-
 
 
 <%- include('partials/footer.ejs'); -%>

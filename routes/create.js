@@ -17,7 +17,15 @@ router.route("/")
 
     //Grabs the username and password from the user.
     const username = req.body.username.trim();
-    const password = req.body.password.trim();  
+    const password = req.body.password.trim(); 
+
+
+    //Check if the username and password are empty. 
+    //If they are, send an alert to the user.
+    if(username || password === "") {          
+        res.send(`<script>alert('Please fill out all fields.'); window.location.href = "/create";</script>`);
+        return;
+    }
 
     //Try Catch checks if the user is in the database.
     try {

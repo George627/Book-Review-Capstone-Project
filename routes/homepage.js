@@ -27,6 +27,11 @@ router.route("/")
     const author = req.body.author.trim();
     const title = req.body.title.trim();
     
+    // Check if the title or author are empty or consist only of whitespace.
+    if (!title || !author) { 
+        res.send(`<script>alert('Please fill out all fields.'); window.location.href = "/homepage";</script>`);
+        return;
+    }
 
     //Try Catch statement that uses the Open Library API. 
     try {

@@ -13,6 +13,7 @@ import loginRoute from "./routes/login.js";
 import sortRoute from "./routes/sort.js";
 import editRoute from "./routes/edit.js";
 import deleteRoute from "./routes/delete.js";
+import authRoute from "./routes/auth.js";
 
 
 
@@ -55,6 +56,8 @@ app.get("/", (req, res) => {
     res.render("login.ejs");
 });
 
+//Auth post request.
+app.use("/", authRoute);
 
 //Signin Route.
 app.use("/signin", signinRoute);
@@ -96,3 +99,5 @@ app.use("/delete", deleteRoute);
 app.listen(port, () => {
     console.log(`Server running on port ${port}`);
 });
+
+
