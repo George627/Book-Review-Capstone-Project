@@ -14,6 +14,7 @@ import sortRoute from "./routes/sort.js";
 import editRoute from "./routes/edit.js";
 import deleteRoute from "./routes/delete.js";
 import authRoute from "./routes/auth.js";
+import publicRoute from "./routes/public.js";
 
 
 
@@ -65,6 +66,10 @@ app.use("/signin", signinRoute);
 
 //Create Route.
 app.use("/create", createRoute);
+
+
+//public Route
+app.use("/public", publicRoute);
 
 
 //Homepage Route.

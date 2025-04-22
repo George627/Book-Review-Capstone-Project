@@ -13,7 +13,7 @@ router.route("/")
 })
 //Sign-in post request.
 .post(passport.authenticate("local", {
-    successRedirect: "/homepage",
+    successRedirect: "/public",
     failureRedirect: "/signin",
 }));
 
@@ -27,6 +27,8 @@ passport.use(new Strategy(async function verify(username, password, cb) {
         if (error) {
             return cb(error);
         }
+
+        if (!username.trim()) { return cb(null, false, { message: 'Incorrect username or password.' }); }
 
         // Check if the user exists in the database
         if (data && data.length > 0) {

@@ -62,7 +62,7 @@ router.route("/")
                              
                         req.logIn(user, (err) => {
                             
-                            res.render("homepage.ejs", {     
+                            res.render("public.ejs", {     
                                 username: req.user
                             }); 
                         }); 

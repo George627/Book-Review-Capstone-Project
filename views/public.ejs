@@ -1,0 +1,110 @@
+<%- include('partials/header.ejs'); -%> 
+
+<body>
+
+  <% if(locals.reviews){ %>
+  
+  <%# Mission Statement. %>
+  <section class="py-5 text-center container album">
+    <div class="row py-lg-5">
+      <div class="col-lg-6 col-md-8 mx-auto">
+        <h1 class="fw-light">Mission Statement</h1>
+        <p class="lead">Books are treasures that shape us to the people we are today. Share the treasures you find with your fellow readers.</p>
+      </div>
+    </div>
+  </section>  
+
+  <%# Top three most reviewed. %>
+  <div id="myCarousel" class="carousel slide mb-6 pointer-event" data-bs-ride="carousel">
+      <div class="carousel-indicators">
+        <button type="button" data-bs-target="#myCarousel" data-bs-slide-to="0" class="active" aria-label="Slide 1"></button>
+        <button type="button" data-bs-target="#myCarousel" data-bs-slide-to="1" aria-label="Slide 2" class=""></button>
+        <button type="button" data-bs-target="#myCarousel" data-bs-slide-to="2" aria-label="Slide 3" class="" aria-current="true"></button>
+      </div>
+      <div class="carousel-inner">
+        <h1 class="text-black mb-4 mt-4 text-center">Top 3 Most Reviewed Books</h2>
+        <div class="carousel-item active">
+          <svg class="bd-placeholder-img" width="100%" height="720" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" preserveAspectRatio="xMidYMid slice"><rect width="100%" height="100%" fill="var(--bs-secondary-color)"></rect></svg>
+          <div class="container text-center">
+            <div class="carousel-caption">
+              <div class="card mb-3" style="width: 18rem;">
+                <img class="card-img-top" src=<%= reviews[0].book_cover %> alt="Card image cap">
+                <div class="card-body">
+                  <h5 class="card-title"><%= reviews[0].title %></h5>
+                  <p class="card-text">This book by <%= reviews[0].author %> is the most reviewed book on our website!</p>
+                  <a href="#" class="btn btn-primary">View Reviews</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="carousel-item">
+          <svg class="bd-placeholder-img" width="100%" height="720" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" preserveAspectRatio="xMidYMid slice"><rect width="100%" height="100%" fill="var(--bs-secondary-color)"></rect></svg>
+          <div class="container text-center">
+            <div class="carousel-caption">
+              <div class="card mb-3" style="width: 18rem;">
+                <img class="card-img-top" src=<%= reviews[1].book_cover %> alt="Card image cap">
+                <div class="card-body">
+                  <h5 class="card-title"><%= reviews[1].title %></h5>
+                  <p class="card-text">This book by <%= reviews[1].author %> is the second most reviewed book on our website!</p>
+                  <a href="#" class="btn btn-primary">View Reviews</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="carousel-item">
+          <svg class="bd-placeholder-img" width="100%" height="720" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" preserveAspectRatio="xMidYMid slice"><rect width="100%" height="100%" fill="var(--bs-secondary-color)"></rect></svg>
+          <div class="container text-center">
+            <div class="carousel-caption">
+              <div class="card mb-3" style="width: 18rem;">
+                <img class="card-img-top" src=<%= reviews[2].book_cover %> alt="Card image cap">
+                <div class="card-body">
+                  <h5 class="card-title"><%= reviews[2].title %></h5>
+                  <p class="card-text">This book by <%= reviews[2].author %> is the third most reviewed book on our website!</p>
+                  <a href="#" class="btn btn-primary">View Reviews</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <button class="carousel-control-prev" type="button" data-bs-target="#myCarousel" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Previous</span>
+      </button>
+      <button class="carousel-control-next" type="button" data-bs-target="#myCarousel" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
+      </button>
+    </div>
+
+    <div class="album py-5 bg-body-tertiary">
+      <div class="container">
+        <h1 class="text-black mb-5 text-center">Book Library</h2>
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+          
+          <% for (let i = 0; i < restOfReviews.length; i++) { %>
+          <div class="col">
+            <div class="card text-center shadow-sm">
+              <img class="card-img-top" src=<%= restOfReviews[i].book_cover %> alt="Card image cap">
+              <div class="card-body">
+                <h5 class="card-title"><%= restOfReviews[i].title %></h5>
+                <p class="card-text">This book was created by <%= restOfReviews[i].author %>.</p>
+                <div class="d-flex justify-content-center align-items-center mx-auto">
+                  <div class="btn-group">
+                    <button type="button" class="btn btn-sm btn-primary">View Reviews</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <% } %>
+        </div>
+      </div>
+    </div>
+    <% } %>
+  </body>
+
+<%- include('partials/footer.ejs'); -%>
