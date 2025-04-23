@@ -1,0 +1,44 @@
+<%- include("partials/header.ejs") %>
+    
+    <body>
+        
+    <%# If there is a username and if there is reviews...%>    
+    <% if(locals.reviews){ %>
+    
+        <section class="jumbotron text-center bg-dark py-3 mb-4">
+            <div class="container">         
+                <img class="text-center mt-5 mb-5 rounded" src=<%= reviews[0].book_cover %> alt="Book Cover" width="280px" height="451px">          
+                <div class="mb-5">
+                    <p class="lead text-white">"<%= reviews[0].title %>" was created by <%= reviews[0].author %>. Below are reviews based around the book. Feel free to leave a post yourself on your homepage!</p> 
+                </div>           
+            </div>
+        </section>
+       
+
+        <%# Display all reviews in messages with card elements. %>
+            <div class="row mb-2">
+                <% for(let i = 0; i < reviews.length; i++) {%>
+                <div class="col-md-6">                 
+                  <div class="card row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
+                    <div class="col p-4 d-flex flex-column position-static">   
+                        <h3 class="mb-1"><%= reviews[i].username %></h3>
+                        <span id="message" class="m-b-15 d-block mb-2"> Rating: <%= reviews[i].rating %> </span>
+                        <p class="card-text mb-auto"><%= reviews[i].review %></p>
+                    </div>                 
+                  </div>    
+                </div>
+               <% } %> 
+            </div> 
+        
+    
+        <%# Else, there is no reviews. %>
+    <% } else { %>
+
+        <br>
+
+        <h1 class="text-center">No History</h1>
+    <% } %>
+   
+  </body>
+
+<%- include("partials/footer.ejs") %>

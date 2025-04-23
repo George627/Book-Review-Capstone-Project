@@ -15,6 +15,7 @@ import editRoute from "./routes/edit.js";
 import deleteRoute from "./routes/delete.js";
 import authRoute from "./routes/auth.js";
 import publicRoute from "./routes/public.js";
+import publicReviewsRoute from "./routes/publicReviews.js";
 
 
 
@@ -70,6 +71,10 @@ app.use("/create", createRoute);
 
 //public Route
 app.use("/public", publicRoute);
+
+
+//Public Reviews Route.
+app.use("/publicReviews", publicReviewsRoute);
 
 
 //Homepage Route.
