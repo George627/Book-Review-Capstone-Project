@@ -20,7 +20,7 @@ router.route("/")
 //Sign-in post request.
 .post(passport.authenticate("local", {
     successRedirect: "/public",
-    failureRedirect: "/signin/failure",
+    failureRedirect: "/signin/",
     failureFlash: true,
 }));
 
@@ -61,16 +61,6 @@ passport.use(new Strategy(async function verify(username, password, cb) {
         return cb(err); // Handle unexpected errors
     }
 }));
-
-
-router.get('/failure', (req, res) => {
-  
-  const message = "Message"
-
-  res.render("signin", {
-    message: message,
-  });
-});
 
 
 passport.serializeUser((user, cb) => {

@@ -18,7 +18,6 @@ import publicRoute from "./routes/public.js";
 import publicReviewsRoute from "./routes/publicReviews.js";
 
 
-
 //Setting up the app and the port number.
 const app = express();
 const port = 3000;
