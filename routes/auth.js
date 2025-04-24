@@ -81,7 +81,7 @@ router.get('/login', (req, res) => {
 router.get('/login/federated/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 
 router.get('/auth/google/bookreview', passport.authenticate('google', { 
-  successRedirect: "/public",
+  successRedirect: "/",
   failureRedirect: "/signin" 
 }));
 
