@@ -54,6 +54,10 @@ footer {
         display: flex;
     }
 
+    .smaller{
+        row-gap: 10px;
+    }
+
     fieldset {
         display: block;
         min-width: 350px;
@@ -93,5 +97,10 @@ footer {
 
     textarea{
         width: 350px
+    }
+
+    .smallButton{
+        padding-top: 5px;
+        padding-bottom: 5px; 
     }
   }
