@@ -8,53 +8,54 @@ const router = express.Router();
 router.route("/")
 //Homepage get request.
 .get(async(req, res) => {
-    
-    if(req.isAuthenticated()){
+           
+    //Try to get the reviews from the database, Catch any errors.
+    try {
 
-        //Try to get the reviews from the database, Catch any errors.
-        try {
+        //This query gets the results of all reviews from the selected user.
+        const { data, error } = await supabase
+            .from('reviews')
+            .select('book_cover, title, author', 'title(count)')
+            .order('title', { ascending: false });
 
-            //This query gets the results of all reviews from the selected user.
-            const { data, error } = await supabase
-                .from('reviews')
-                .select('book_cover, title, author', 'title(count)')
-                .order('title', { ascending: false });
+        if (error) {
+            return cb(error);
+        }     
 
-            if (error) {
-                return cb(error);
-            }     
+        //Empty reviews array that will hold all the results.
+        const mostReviewed = mostFrequent(data, 'title');
 
-            //Empty reviews array that will hold all the results.
-            const mostReviewed = mostFrequent(data, 'title');
+        const firstMostReviewed = data.find((review) => review.title === mostReviewed[0][0]);
+        const secondMostReviewed = data.find((review) => review.title === mostReviewed[1][0]);
+        const thirdMostReviewed = data.find((review) => review.title === mostReviewed[2][0]); 
+        
+        const restOfReviews = data.filter((review) => review.title !== mostReviewed[0][0] && 
+                                                        review.title !== mostReviewed[1][0] && 
+                                                        review.title !== mostReviewed[2][0]);
+                                                        
 
-            const firstMostReviewed = data.find((review) => review.title === mostReviewed[0][0]);
-            const secondMostReviewed = data.find((review) => review.title === mostReviewed[1][0]);
-            const thirdMostReviewed = data.find((review) => review.title === mostReviewed[2][0]); 
+        const reviews = [firstMostReviewed, secondMostReviewed, thirdMostReviewed];
             
-            const restOfReviews = data.filter((review) => review.title !== mostReviewed[0][0] && 
-                                                           review.title !== mostReviewed[1][0] && 
-                                                           review.title !== mostReviewed[2][0]);
-                                                           
-
-            const reviews = [firstMostReviewed, secondMostReviewed, thirdMostReviewed];
-                
-
-
+        if(req.user === undefined){
+            res.render("public.ejs", {
+                reviews: reviews,
+                restOfReviews: restOfReviews, 
+            });
+        }
+        else{
             //Render the reviews.ejs page with the username and the reviews.
             res.render("public.ejs", {
                 username: req.user,
                 reviews: reviews,
                 restOfReviews: restOfReviews, 
             });
-            
-        } catch (error) {
-            res.send("Error in accessing database.", error);
         }
         
-   
-    } else {
-        res.redirect("/signin");
+        
+    } catch (error) {
+        res.send("Error in accessing database.", error);
     }
+        
  
 })
 //Homepage post request.
