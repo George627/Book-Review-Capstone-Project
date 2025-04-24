@@ -12,7 +12,7 @@ var router = express.Router();
 router.use(session({
   secret: process.env.SESSION_SECRET,
   resave: false,
-  saveUninitialized: true,
+  saveUninitialized: false,
 }));
 
 router.use(passport.initialize());
@@ -21,7 +21,7 @@ router.use(passport.session());
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-  callbackURL: 'https://book-review-capstone-project-2.onrender.com/auth/google/bookreview',
+  callbackURL: process.env.GOOGLE_CLIENT_CALLBACK_URL,
 },
   async (accessToken, refreshToken, profile, done) => {
 
@@ -30,6 +30,10 @@ passport.use(new GoogleStrategy({
         .from('users')
         .select('google_id')
         .eq('google_id', profile.id);
+
+    if (error) {
+      return done(error, null);
+    }
 
     //If there are no results, add the user and password to the users database.
     if(data.length === 0){

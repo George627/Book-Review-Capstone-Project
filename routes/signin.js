@@ -3,13 +3,9 @@ import passport from "passport";
 import { Strategy } from "passport-local";
 import supabase from '../supabaseClient.js';
 import bcrypt from "bcrypt";
-import flash from "express-flash";
+
 
 const router = express.Router();
-
-router.use(flash());
-
-router.use(express.static("public"));
 
 //Sign-in Route.
 router.route("/")
@@ -21,7 +17,6 @@ router.route("/")
 .post(passport.authenticate("local", {
     successRedirect: "/public",
     failureRedirect: "/signin/",
-    failureFlash: true,
 }));
 
 passport.use(new Strategy(async function verify(username, password, cb) {

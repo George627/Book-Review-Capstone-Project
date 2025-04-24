@@ -30,6 +30,11 @@ env.config();
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
+// Ensure SESSION_SECRET is defined.
+if (!process.env.SESSION_SECRET) {
+    throw new Error("SESSION_SECRET is not defined in the environment variables.");
+}
+
 //Session.
 app.use(session({
     secret: process.env.SESSION_SECRET,
@@ -61,13 +66,8 @@ app.use("/signin", signinRoute);
 //Auth Route.
 app.use("/", authRoute);
 
-
-//Create Route.
+// Remove duplicate public route registration.
 app.use("/create", createRoute);
-
-
-//public Route
-app.use("/public", publicRoute);
 
 
 //Public Reviews Route.
