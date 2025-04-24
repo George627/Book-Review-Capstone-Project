@@ -31,6 +31,7 @@ env.config();
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
+
 //Session.
 app.use(session({
     secret: process.env.SESSION_SECRET,
@@ -52,15 +53,16 @@ app.set('view engine', 'ejs');
 app.set('views', './views');
 
 
+//Get method for the starting page of the app.
+app.get("/", (req, res) => {
+    res.render("login.ejs");
+});
 
-//Public Get request.
-app.use("/", publicRoute);
+//Auth post request.
+app.use("/", authRoute);
 
 //Signin Route.
 app.use("/signin", signinRoute);
-
-//Auth Route.
-app.use("/", authRoute);
 
 
 //Create Route.

@@ -10,7 +10,7 @@ const saltRounds = 10;
 router.route("/")
 //Create get method.
 .get((req, res) => {
-    res.render("create.ejs");
+    res.render("signin.ejs");
 })
 //Create post request.
 .post(async(req, res) => {
