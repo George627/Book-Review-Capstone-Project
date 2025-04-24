@@ -22,7 +22,7 @@ router.route("/")
 
     //Check if the username and password are empty. 
     //If they are, send an alert to the user.
-    if(username || password === "") {          
+    if(!username || !password) {          
         res.send(`<script>alert('Please fill out all fields.'); window.location.href = "/create";</script>`);
         return;
     }
