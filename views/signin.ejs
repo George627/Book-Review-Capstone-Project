@@ -7,6 +7,12 @@
       <%# Form that submits to the signin post request located in index.js. %>
       <form action="/signin" method="POST" class="form mx-auto mt-5">
         <h1 class="h3 mb-3 fw-normal">Sign in</h1>
+
+        <% if(locals.message){%>
+          <div class="alert alert-danger" role="alert">
+            Wrong username or password.
+          </div>
+        <% } %>
         
         <%# Div containing the Username field. %>
         <div class="form-floating">

@@ -7,6 +7,8 @@ import bcrypt from "bcrypt";
 
 const router = express.Router();
 
+router.use(express.static("public"));
+
 //Sign-in Route.
 router.route("/")
 //Sign-in get method
@@ -15,8 +17,8 @@ router.route("/")
 })
 //Sign-in post request.
 .post(passport.authenticate("local", {
-    successRedirect: "/public",
-    failureRedirect: "/signin/",
+    successRedirect: "/",
+    failureRedirect: "/signin/failure",
 }));
 
 passport.use(new Strategy(async function verify(username, password, cb) {
@@ -56,6 +58,14 @@ passport.use(new Strategy(async function verify(username, password, cb) {
         return cb(err); // Handle unexpected errors
     }
 }));
+
+
+router.get('/failure', (req, res) => {
+  
+    const message = "Failed";
+  
+    res.render('signin', { message: message });
+});
 
 
 passport.serializeUser((user, cb) => {

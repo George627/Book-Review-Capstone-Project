@@ -57,7 +57,7 @@ app.set('views', './views');
 
 
 
-//Public Get request.
+//Public Root Route request.
 app.use("/", publicRoute);
 
 //Signin Route.

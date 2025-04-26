@@ -22,7 +22,7 @@ router.route("/")
 
     //Check if the username and password are empty. 
     //If they are, send an alert to the user.
-    if(username || password === "") {          
+    if(!username || !password) {          
         res.send(`<script>alert('Please fill out all fields.'); window.location.href = "/create";</script>`);
         return;
     }
@@ -59,10 +59,9 @@ router.route("/")
                         console.log('No results found for the query.');
                     } else {
                         const user = data[0].username;
-                             
-                        req.logIn(user, (err) => {
                             
-                            res.render("public.ejs", {     
+                        req.logIn(user, (err) => {                           
+                            res.render("homepage.ejs", {     
                                 username: req.user
                             }); 
                         }); 
@@ -75,7 +74,7 @@ router.route("/")
 
         //Else, the user already exist in the database.
         else {
-            res.send("User already exist.");
+            res.send(`<script>alert('User already exist.'); window.location.href = "/create";</script>`);
         }
         
     } catch (error) {
