@@ -5,19 +5,24 @@ import session from 'express-session';
 import supabase from '../supabaseClient.js';
 import env from "dotenv";
 
+//ENV Config.
 env.config();
 
+//Router to communicate with index.js.
 var router = express.Router();
 
+//Session.
 router.use(session({
   secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
 }));
 
+//Passport Session.
 router.use(passport.initialize());
 router.use(passport.session());
 
+//Google Passport Strategy.
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
@@ -66,26 +71,31 @@ passport.use(new GoogleStrategy({
   }
 ));
 
+//Complete Serialization of User.
 passport.serializeUser((user, done) => {
   done(null, user);
 });
+
+//Undo Serialization of User.
 passport.deserializeUser((user, done) => { 
   done(null, user);
 });
 
-
+//Render Login path. 
 router.get('/login', (req, res) => {
   res.render('login');
 });
 
+//Google login with the user's profile and email.
 router.get('/login/federated/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 
+//If the Google login is a success, send them to the main page. Else, send them to the signin page.
 router.get('/auth/google/bookreview', passport.authenticate('google', { 
   successRedirect: "/",
   failureRedirect: "/signin" 
 }));
 
-
+//Log the User out.
 router.get('/logout', (req, res) => {
   req.logout((err) => {
     if (err) {
