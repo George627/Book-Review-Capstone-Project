@@ -1,5 +1,3 @@
-To start, type "npm i" then "nodemon index.js".
-
 Book review project uses EJS, Javascript, Axios, and Database.
 
 You can create your account and sign in to the database on the sign-in or create an account screen.
@@ -11,7 +9,7 @@ You can edit the reviews by clicking the button, or delete the review by clickin
 
 Click the homepage tab to pull up the homepage.
 
-Will add a sort feature for reviews at a later date.
+You can also view book reviews from our book library as well!
 
 Name of APIs:
 https://openlibrary.org/dev/docs/api/covers
